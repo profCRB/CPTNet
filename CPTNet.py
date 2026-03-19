@@ -14,8 +14,6 @@ from tensorflow.keras.layers import Concatenate,Multiply,Conv3D,LeakyReLU
 from tensorflow.keras.models import Model,Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import regularizers
-## Sparse Pruning
-#import tensorflow_model_optimization as tfmot
 
 ##Others
 from sklearn.decomposition import PCA
@@ -58,6 +56,7 @@ def cal_SAM_mas_Xformer(XTrain):
     ip_shape=XTrain.shape
     patch_width=ip_shape[2]
     mx_dis=(patch_width-1)/2
+    cp_pos=patch_width//2
     SAM_masks=np.zeros((ip_shape[0],patch_width,patch_width))
     for smpl in range(ip_shape[0]):
         for rw in range(patch_width):
@@ -76,14 +75,14 @@ def dataset_preparation(patch_size):
     extra_width=patch_size//2
     temp_pad=np.pad(temp,((extra_width,extra_width),(extra_width,extra_width),(0,0),(0,0)),mode='edge')
     gt_temp_pad=np.pad(gt_temp,((extra_width,extra_width),(extra_width,extra_width)),mode='edge')
-    temp_og_pad=np.pad(temp_og,((extra_width,extra_width),(extra_width,extra_width),(0,0)),mode='edge')
-    print(temp_pad.shape,temp.shape,gt_temp_pad.shape,temp_og_pad.shape)
+    # temp_og_pad=np.pad(temp_og,((extra_width,extra_width),(extra_width,extra_width),(0,0)),mode='edge')
+    print(temp_pad.shape,temp.shape,gt_temp_pad.shape)
     ## Patches Extracting
     i_h=temp_pad.shape[0]
     i_w=temp_pad.shape[1]
     X_Images=list()
     Y_Labels=list()
-    X_og=list()
+    # X_og=list()
     for hi in range(extra_width,i_h-extra_width):
         for wi in range(extra_width,i_w-extra_width):
             if(gt_temp_pad[hi][wi]==0):
@@ -94,41 +93,41 @@ def dataset_preparation(patch_size):
             w_end=wi+extra_width
             mini_patch=temp_pad[h_start:h_end+1,w_start:w_end+1,:,:]
             mini_class=gt_temp_pad[hi][wi]
-            mini_og=temp_og_pad[h_start:h_end+1,w_start:w_end+1,:]
+            # mini_og=temp_og_pad[h_start:h_end+1,w_start:w_end+1,:]
             X_Images.append(mini_patch)
             Y_Labels.append(mini_class)
-            X_og.append(mini_og)
+            # X_og.append(mini_og)
     X_Images=np.asarray(X_Images)
     Y_Labels=np.asarray(Y_Labels)
-    X_og=np.asarray(X_og)
+    # X_og=np.asarray(X_og)
 
-    X_Images,Y_Labels,X_og=unison_shuffled_copies(X_Images,Y_Labels,X_og)
+    X_Images,Y_Labels,Y_dummy=unison_shuffled_copies(X_Images,Y_Labels,Y_Labels)
     ## Removing Background samples
     ##
-    Trn_IP=[0,10,71,41,11,24,36,10,23,10,48,122,29,10,63,19,10]
+    # Trn_IP=[0,10,71,41,11,24,36,10,23,10,48,122,29,10,63,19,10]
     Trn_IP_counter=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     X_Train=list()
     Y_Train=list()
     X_Test=list()
     Y_Test=list()
-    X_og_Tr=list()
-    X_og_Ts=list()
+    # X_og_Tr=list()
+    # X_og_Ts=list()
     ##
     for i in range(len(X_Images)):
         cls_i=Y_Labels[i]
         if(Trn_IP_counter[cls_i]<Trn_IP[cls_i]):
             X_Train.append(X_Images[i])
             Y_Train.append(Y_Labels[i])
-            X_og_Tr.append(X_og[i])
+            # X_og_Tr.append(X_og[i])
             Trn_IP_counter[cls_i]=Trn_IP_counter[cls_i]+1
         else:
             X_Test.append(X_Images[i])
             Y_Test.append(Y_Labels[i])
-            X_og_Ts.append(X_og[i])
+            # X_og_Ts.append(X_og[i])
     ##Free Up Ram
     del X_Images
     del Y_Labels
-    del X_og
+    # del X_og
     del gt_temp_pad
     del temp_pad
     ##
@@ -136,39 +135,39 @@ def dataset_preparation(patch_size):
     Y_Train=np.asarray(Y_Train)
     X_Test=np.asarray(X_Test)
     Y_Test=np.asarray(Y_Test)
-    X_og_Tr=np.asarray(X_og_Tr)
-    X_og_Ts=np.asarray(X_og_Ts)
+    # X_og_Tr=np.asarray(X_og_Tr)
+    # X_og_Ts=np.asarray(X_og_Ts)
     print(X_Train.shape,Y_Train.shape,Y_Test.shape,X_Test.shape)
-    print(X_og_Tr.shape,X_og_Ts.shape)
+    # print(X_og_Tr.shape,X_og_Ts.shape)
     ## Validation dataset preparation
-    Vld_IP=[0,10,71,41,11,24,36,10,23,5,48,122,29,10,63,19,10]
+    # Vld_IP=[0,10,71,41,11,24,36,10,23,5,48,122,29,10,63,19,10]
     Vld_IP_counter=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     X_Vld=list()
     Y_Vld=list()
-    X_og_Vld=list()
+    # X_og_Vld=list()
     New_X_Test=list()
     New_Y_Test=list()
-    New_X_og=list()
+    # New_X_og=list()
     for i in range(len(X_Test)):
         cls_i=Y_Test[i]
         if(Vld_IP_counter[cls_i]<Vld_IP[cls_i]):
             X_Vld.append(X_Test[i])
             Y_Vld.append(Y_Test[i])
-            X_og_Vld.append(X_og_Ts[i])
+            # X_og_Vld.append(X_og_Ts[i])
             Vld_IP_counter[cls_i]=Vld_IP_counter[cls_i]+1
         else:
             New_X_Test.append(X_Test[i])
             New_Y_Test.append(Y_Test[i])
-            New_X_og.append(X_og_Ts[i])
+            # New_X_og.append(X_og_Ts[i])
     del X_Test
     del Y_Test
-    del X_og_Ts
+    # del X_og_Ts
     X_Test=np.asarray(New_X_Test)
     Y_Test=np.asarray(New_Y_Test)
     X_Vld=np.asarray(X_Vld)
     Y_Vld=np.asarray(Y_Vld)
-    X_og_Ts=np.asarray(New_X_og)
-    X_og_Vld=np.asarray(X_og_Vld)
+    # X_og_Ts=np.asarray(New_X_og)
+    # X_og_Vld=np.asarray(X_og_Vld)
     list_class_length=list()
     for i in range(17):
         x=np.sum(Y_Train==i)
@@ -177,9 +176,9 @@ def dataset_preparation(patch_size):
         list_class_length.append((x+y+z))
         print(x,z,y)
     print(list_class_length)
-    X_og_Tr=cal_SAM_mas_Xformer(X_og_Tr)
-    X_og_Ts=cal_SAM_mas_Xformer(X_og_Ts)
-    X_og_Vld=cal_SAM_mas_Xformer(X_og_Vld)
+    X_og_Tr=cal_SAM_mas_Xformer(X_Train)
+    X_og_Ts=cal_SAM_mas_Xformer(X_Test)
+    X_og_Vld=cal_SAM_mas_Xformer(X_Vld)
 
     #Agumentation
     X_Train,Y_Train,X_og_Tr=data_agumentation(X_Train,Y_Train,X_og_Tr)
@@ -206,50 +205,66 @@ def dataset_preparation(patch_size):
     return X_Train,Y_Train,Y_Tr_hot,X_Test,Y_Test,Y_Ts_hot,X_Vld,Y_Vld,Y_Vld_hot,X_og_Tr,X_og_Vld,X_og_Ts
 
 def data_agumentation(X_Train,Y_Train,X_og_Tr):
-    X_hf_Train=horizontal_flipping_v2(X_Train)
-    print(X_hf_Train.shape)
-    X_vf_Train=vertical_flipping_v2(X_Train)
-    print(X_vf_Train.shape)
-    X_r90_Train=np.rot90(np.copy(X_Train),k=1,axes=(1,2))
-    print(X_r90_Train.shape)
-    X_r180_Train=np.rot90(np.copy(X_Train),k=2,axes=(1,2))
-    print(X_r180_Train.shape)
-    X_r270_Train=np.rot90(np.copy(X_Train),k=3,axes=(1,2))
-    print(X_r270_Train.shape)
-    #
     X_Train_Copy2=np.copy(X_Train)
     Y_Train_Copy2=np.copy(Y_Train)
+    #
+    X_hf_Train=horizontal_flipping_v2(X_Train_Copy2)
+    print(X_hf_Train.shape)
     X_Train=np.concatenate((X_Train,X_hf_Train),axis=0)
-    X_Train=np.concatenate((X_Train,X_vf_Train),axis=0)
-    X_Train=np.concatenate((X_Train,X_r90_Train),axis=0)
-    X_Train=np.concatenate((X_Train,X_r180_Train),axis=0)
-    X_Train=np.concatenate((X_Train,X_r270_Train),axis=0)
-    #deletions
     del X_hf_Train
+    #
+    X_vf_Train=vertical_flipping_v2(X_Train_Copy2)
+    print(X_vf_Train.shape)
+    X_Train=np.concatenate((X_Train,X_vf_Train),axis=0)
     del X_vf_Train
+    #
+    X_r90_Train=np.rot90(np.copy(X_Train_Copy2),k=1,axes=(1,2))
+    print(X_r90_Train.shape)
+    X_Train=np.concatenate((X_Train,X_r90_Train),axis=0)
     del X_r90_Train
+    #
+    X_r180_Train=np.rot90(np.copy(X_Train_Copy2),k=2,axes=(1,2))
+    print(X_r180_Train.shape)
+    X_Train=np.concatenate((X_Train,X_r180_Train),axis=0)
     del X_r180_Train
+    #
+    X_r270_Train=np.rot90(np.copy(X_Train_Copy2),k=3,axes=(1,2))
+    print(X_r270_Train.shape)
+    X_Train=np.concatenate((X_Train,X_r270_Train),axis=0)
     del X_r270_Train
+    #
+    del X_Train_Copy2
 
     Y_Train=np.concatenate((Y_Train,Y_Train_Copy2),axis=0)
     Y_Train=np.concatenate((Y_Train,Y_Train_Copy2),axis=0)
     Y_Train=np.concatenate((Y_Train,Y_Train_Copy2),axis=0)
     Y_Train=np.concatenate((Y_Train,Y_Train_Copy2),axis=0)
     Y_Train=np.concatenate((Y_Train,Y_Train_Copy2),axis=0)
+    del Y_Train_Copy2
+
     ##Og agumentations
-    X_og_Tr_hf=np.array([np.fliplr(img) for img in X_og_Tr])
-    X_og_Tr_vf=np.array([np.flipud(img) for img in X_og_Tr])
-    X_og_Tr_r90=np.rot90(np.copy(X_og_Tr),k=1,axes=(1,2))
-    X_og_Tr_r180=np.rot90(np.copy(X_og_Tr),k=2,axes=(1,2))
-    X_og_Tr_r270=np.rot90(np.copy(X_og_Tr),k=3,axes=(1,2))
-
+    X_og_Tr_copy_2=np.copy(X_og_Tr)
+    X_og_Tr_hf=np.array([np.fliplr(img) for img in X_og_Tr_copy_2])
     X_og_Tr=np.concatenate((X_og_Tr,X_og_Tr_hf),axis=0)
+    del X_og_Tr_hf
+    #
+    X_og_Tr_vf=np.array([np.flipud(img) for img in X_og_Tr_copy_2])
     X_og_Tr=np.concatenate((X_og_Tr,X_og_Tr_vf),axis=0)
+    del X_og_Tr_vf
+    #
+    X_og_Tr_r90=np.rot90(np.copy(X_og_Tr_copy_2),k=1,axes=(1,2))
     X_og_Tr=np.concatenate((X_og_Tr,X_og_Tr_r90),axis=0)
+    del X_og_Tr_r90
+    #
+    X_og_Tr_r180=np.rot90(np.copy(X_og_Tr_copy_2),k=2,axes=(1,2))
     X_og_Tr=np.concatenate((X_og_Tr,X_og_Tr_r180),axis=0)
+    del X_og_Tr_r180
+    #
+    X_og_Tr_r270=np.rot90(np.copy(X_og_Tr_copy_2),k=3,axes=(1,2))
     X_og_Tr=np.concatenate((X_og_Tr,X_og_Tr_r270),axis=0)
-    #deletions
-    del X_og_Tr_hf,X_og_Tr_vf,X_og_Tr_r90,X_og_Tr_r180,X_og_Tr_r270,Y_Train_Copy2
+    del X_og_Tr_r270
+    #
+    del X_og_Tr_copy_2
     #return
     return X_Train,Y_Train,X_og_Tr
 
@@ -281,7 +296,6 @@ def cal_class_accuracies(Y_True,Y_Pred,num_classes):
     print(count/len(Y_True))
     return cls_accuracy,np.mean(cls_accuracy),(count/len(Y_True))
 
-
 class LearnableMultiplication(Layer):
     def __init__(self, input_dim, output_dim):
         super(LearnableMultiplication, self).__init__()
@@ -302,28 +316,28 @@ class LearnableMultiplication(Layer):
         # Perform tensordot on the last axis of inputs and first axis of B
         return tf.tensordot(inputs, self.B, axes=[-1, 0])  # result: (..., output_dim)
 class MultiHeadAttention(Layer):
-    def __init__(self,input_dim,embed_dim,num_heads):
+    def __init__(self,input_dim,num_heads=5):
         super(MultiHeadAttention, self).__init__()
-        assert embed_dim % num_heads == 0, "embed_dim must be divisible by num_heads"
-        self.embed_dim = embed_dim
+        # assert embed_dim % num_heads == 0, "embed_dim must be divisible by num_heads"
+        # self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.input_dim=input_dim
-        self.head_dim = embed_dim // num_heads
-        self.key_dim=input_dim
-        self.key_embed_dim=self.key_dim*num_heads
+        self.head_dim = input_dim // num_heads
+        self.key_dim=input_dim // num_heads
+        self.key_embed_dim=self.key_dim * num_heads
         self.Softmax=Softmax(axis=-1)
         self.leaklyReLU=LeakyReLU(alpha=0.1)
 
         # Projections
         self.q_proj = LearnableMultiplication(input_dim=self.input_dim, output_dim=self.key_embed_dim)
         self.k_proj = LearnableMultiplication(input_dim=self.input_dim, output_dim=self.key_embed_dim)
-        self.v_proj = LearnableMultiplication(input_dim=self.input_dim, output_dim=self.embed_dim)
+        self.v_proj = LearnableMultiplication(input_dim=self.input_dim, output_dim=self.key_embed_dim)
 
         # Final output projection
-        self.output_proj = LearnableMultiplication(input_dim=self.embed_dim, output_dim=self.input_dim)
+        self.output_proj = LearnableMultiplication(input_dim=self.key_embed_dim, output_dim=self.input_dim)
 
     def split_heads(self, x):
-        # x: (B, H, W, P, embed_dim)
+        # x: (B, H, W, P, key_embed_dim)
         B, H, W, P, D = tf.unstack(tf.shape(x))
         #print(D//self.num_heads)
         x = tf.reshape(x, (B, H, W, P, self.num_heads, D//self.num_heads))
@@ -375,17 +389,17 @@ class TransformerFFN(Layer):
         return x
 
 class TransSingleUnit(Layer):
-    def __init__(self, input_dim, embed_dim, num_heads, ffn_hidden_dim):
+    def __init__(self, input_dim,num_heads=5,ffn_hidden_dim=100):
         super(TransSingleUnit, self).__init__()
-        self.mha= MultiHeadAttention(input_dim=input_dim,embed_dim=embed_dim,num_heads=num_heads)
+        self.mha= MultiHeadAttention(input_dim=input_dim,num_heads=num_heads)
         self.ffn=TransformerFFN(hidden_dim=ffn_hidden_dim,output_dim=input_dim)
         self.lnm1=LayerNormalization(epsilon=1e-6)
         self.lnm2=LayerNormalization(epsilon=1e-6)
     def call(self,X):
         mha_output=self.mha(X)
-        mha_add_norm=X+self.lnm1(mha_output)
+        mha_add_norm=self.lnm1(X+mha_output)
         ffn_output=self.ffn(mha_add_norm)
-        ffn_add_norm=mha_add_norm+self.lnm2(ffn_output)
+        ffn_add_norm=self.lnm2(mha_add_norm+ffn_output)
         return ffn_add_norm
 class GAPLayer(Layer):
     def __init__(self):
@@ -400,6 +414,18 @@ class ReduceSpatial_v2(Layer):
     def call(self, inputs1,inputs2):
         tns_mul=inputs1*inputs2
         tf_reduce=tf.reduce_mean(tns_mul, axis=[1,2], keepdims=True)
+        return tf_reduce
+    def get_config(self):
+        config = super().get_config()
+        return config
+
+
+class ReduceSpatial_no_SFB(Layer):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+    def call(self, inputs1,inputs2):
+        # tns_mul=inputs1*inputs2
+        tf_reduce=tf.reduce_mean(inputs1, axis=[1,2], keepdims=True)
         return tf_reduce
     def get_config(self):
         config = super().get_config()
@@ -478,44 +504,109 @@ class PruningCallback(tf.keras.callbacks.Callback):
 def modelXformer(input_shape,num_heads,trans_levels,num_classes):
     ##
     input_dim=input_shape[-1]
-    embed_dim=input_dim*num_heads
+    # embed_dim=input_dim
     ffn_hidden_dim=num_heads*input_dim
     ##
     inputs=Input(shape=input_shape)
     inputs2=Input(shape=input_shape)
     ## Dense and Pruning
     X_inputs = PrunableDense(input_dim, activation=None, target_sparsity=0.25, l1_reg=0.001, name='prune_dense_initial')(inputs)
-
     X_inputs=LeakyReLU(alpha=0.2)(X_inputs)
     ##transformer operations
-    tsu_layer_1=TransSingleUnit(input_dim,embed_dim,num_heads,ffn_hidden_dim)
+    tsu_layer_1=TransSingleUnit(input_dim,num_heads,ffn_hidden_dim)
     ##
     X_1=tsu_layer_1(X_inputs)
     for i in range(trans_levels-1):
-        tsu_layer_i=TransSingleUnit(input_dim,embed_dim,num_heads,ffn_hidden_dim)
+        tsu_layer_i=TransSingleUnit(input_dim,num_heads,ffn_hidden_dim)
         X_1=tsu_layer_i(X_1)
     Y=ReduceSpatial_v2()(X_1,inputs2)
     Y=Flatten()(Y)
     # Wrap final Dense layer in a Sequential model and prune it
     Y = PrunableDense(num_classes, activation=None, target_sparsity=0.5, l1_reg=0.001,name='prune_dense_final')(Y)
+    # Y=Dense(units=num_classes,activation=None)(Y)
     Y = Softmax()(Y)
     model=Model(inputs=[inputs,inputs2], outputs=Y)
     adam = Adam(learning_rate=base_learning_rate)
     model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
+def total_hsimage_prediction(patch_size,modelhsi):
+    count=0
+    patch_predictions=np.zeros(gt_temp.shape)
+    extra_width=patch_size//2
+    ## Padding
+    temp_pad=np.pad(temp,((extra_width,extra_width),(extra_width,extra_width),(0,0),(0,0)),mode='edge')
+    gt_temp_pad=np.pad(gt_temp,((extra_width,extra_width),(extra_width,extra_width)),mode='edge')
+    print('Temp pad shape : ',temp_pad.shape,' GT pad shape : ',gt_temp_pad.shape)
+    print('temp shape : ',temp.shape,' GT shape : ',gt_temp.shape)
+    ## Patches Extracting
+    i_h=temp_pad.shape[0]
+    i_w=temp_pad.shape[1]
+    ##
+    total_samples=int(np.sum(gt_temp>0))
+    print('Total samples to predict : ',total_samples)
+    label_positions=np.zeros((total_samples,2),dtype=int)
+    X_all=np.zeros((total_samples,patch_size,patch_size,temp.shape[-2],temp.shape[-1]))
+    sample_count=0
+
+    for hi in range(extra_width,i_h-extra_width):
+        for wi in range(extra_width,i_w-extra_width):
+            mini_class=gt_temp_pad[hi][wi]
+            if(mini_class==0):
+                continue
+            h_start=hi-extra_width
+            w_start=wi-extra_width
+            h_end=hi+extra_width
+            w_end=wi+extra_width
+            #
+            mini_patch=temp_pad[h_start:h_end+1,w_start:w_end+1,:,:]
+            X_all[sample_count,:,:,:,:]=mini_patch
+            #
+            label_positions[sample_count][0]=h_start
+            label_positions[sample_count][1]=w_start
+            sample_count=sample_count+1
+
+
+    X2_all=cal_SAM_mas_Xformer(X_all)
+    X2_all=np.tile(np.expand_dims(X2_all,axis=(-2,-1)),(1,1,1,X_all.shape[-2],X_all.shape[-1]))
+    print('Input1 shape: ',X_all.shape)
+    print('Input2 shape: ',X2_all.shape)
+    #
+    Y_pred_hot=modelhsi.predict([X_all,X2_all],batch_size=40,verbose=0)
+    Y_pred=hot_to_labels(Y_pred_hot)
+    print(f"total sample = {total_samples}, len of pridiction = {len(Y_pred)}")
+    for i in range(total_samples):
+      x_pos=label_positions[i][0]
+      y_pos=label_positions[i][1]
+      patch_predictions[x_pos][y_pos]=Y_pred[i].item()
+      # if(patch_predictions[x_pos][y_pos]==gt_temp[x_pos][y_pos]):
+      #   count=count+1
+    print('Correct count : ',int( np.sum(patch_predictions==gt_temp)-np.sum(gt_temp==0) ) )
+    return patch_predictions
 
 ## Execution Parameters
 base_learning_rate=0.0001
-#early_stopping = EarlyStopping(monitor='val_loss',mode='min',patience=10,restore_best_weights=True)
-#reduce_lr_op=ReduceLROnPlateau(monitor="val_loss",factor=0.9,patience=5,verbose=0,min_delta=0.0001,min_lr=0)
-#sparse_pruning = tfmot.sparsity.keras.UpdatePruningStep()
 total_epochs=1000
 batch_size=16
 rl_l1_l2=regularizers.L1L2(l1=0,l2=0.0001)
 rl_l1=regularizers.L1L2(l1=0.001,l2=0)
-p_size=13
-dataset_classes=16
+p_size=11
+dataset_classes=16 # For Salinas 16 and for Pavia Centre 9
+trans_fe_levels=25
+
+## Indian Pines - Number of samples for Training and Validation.
+Trn_IP=[0,10,71,41,11,24,36,10,23,10,48,122,29,10,63,19,10]
+Vld_IP=[0,10,71,41,11,24,36,10,23,5,48,122,29,10,63,19,10]
+
+## Pavia Centre - Number of samples for Training and Validation
+# Trn_IP=[0,20,20,20,20,20,20,20,20,20]
+# Vld_IP=[0,20,20,20,20,20,20,20,20,20]
+
+## Salinas - Number of samples for Training and Validation
+# Trn_IP=[0,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
+# Vld_IP=[0,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
+
+
 
 
 ## File loading coding lines, Uncomment accordingly
@@ -531,6 +622,7 @@ dataset_classes=16
 
 
 
+
 all_class_matrix=np.zeros((dataset_classes,10))
 all_AOK_matrix=np.zeros((3,10))
 for rsi in range(10):
@@ -543,14 +635,16 @@ for rsi in range(10):
     X_og_Ts_Ex=np.tile(np.expand_dims(X_og_Ts,axis=(-2,-1)),(1,1,1,X_Train.shape[-2],X_Train.shape[-1]))
     print(X_og_Tr_Ex.shape,X_og_Vld_Ex.shape,X_og_Ts_Ex.shape)
     #modelXformer(input_shape,num_heads,trans_levels,num_classes)
-    hsicl=modelXformer((None,None,5,20),5,10,dataset_classes)
+    hsicl=modelXformer((None,None,5,10),5,trans_fe_levels,dataset_classes)
+    if(rsi==0):
+      print(hsicl.summary())
     layers_to_prune = [hsicl.get_layer('prune_dense_initial'),hsicl.get_layer('prune_dense_final')]
     pruning_cb = PruningCallback(layers_to_prune, start_epoch=20, end_epoch=30)
     early_stopping = EarlyStopping(monitor='val_loss',mode='min',patience=10,restore_best_weights=True)
-    reduce_lr_op=ReduceLROnPlateau(monitor="val_loss",factor=0.9,patience=5,verbose=0,min_delta=0.0001,min_lr=0)
+    # reduce_lr_op=ReduceLROnPlateau(monitor="val_loss",factor=0.9,patience=5,verbose=0,min_delta=0.0001,min_lr=0)
     #hsicl.summary()
     history=hsicl.fit([X_Train,X_og_Tr_Ex],Y_Tr_hot,epochs=total_epochs,batch_size=batch_size, verbose=0,
-                      validation_data=([X_Vld,X_og_Vld_Ex],Y_Vld_hot),callbacks=[early_stopping,reduce_lr_op,pruning_cb])
+                      validation_data=([X_Vld,X_og_Vld_Ex],Y_Vld_hot),callbacks=[early_stopping,pruning_cb])
     Y_pred_hot=hsicl.predict([X_Test,X_og_Ts_Ex],batch_size=40,verbose=0)
     Y_Pred=hot_to_labels(Y_pred_hot)
     print('Metrics for rand seed: ',ran_seed)
@@ -559,6 +653,18 @@ for rsi in range(10):
     print("Kappa Coefficient: ", kappa)
     all_AOK_matrix[2,rsi]=kappa
     print('No Epochs', len(history.history['loss']))
+    #
+    del X_Train,Y_Train,Y_Tr_hot,X_Test,Y_Test,Y_Ts_hot,X_Vld,Y_Vld,Y_Vld_hot,X_og_Tr,X_og_Vld,X_og_Ts
+    del X_og_Tr_Ex,X_og_Vld_Ex,X_og_Ts_Ex
+    #
+    # pp_ip=total_hsimage_prediction(p_size,hsicl)
+    # file_path_full_image = '/content/drive/MyDrive/PaviaCentre/CPTNet_Full_Image_PC.npy'
+    # np.save(file_path_full_image,pp_ip)
+    #
+    del hsicl,history,early_stopping,Y_pred_hot,Y_Pred
+    # del layers_to_prune,pruning_cb
+
+
 
 
 print('********-----------------------------------------------------------------------------------*********')
