@@ -19,8 +19,10 @@ Use the following python code statements in CPTNet.py to load numpy arrays and s
 #### print(temp.shape)
 
 ### Selecting  Number of samples for Training and Validation for Indian Pines datset
+```
 Trn_IP=[0,10,71,41,11,24,36,10,23,10,48,122,29,10,63,19,10]
 Vld_IP=[0,10,71,41,11,24,36,10,23,5,48,122,29,10,63,19,10]
+```
 
 ### Loading numpy files for Salinas Dataset
 file_path_temp = '/content/drive/MyDrive/Salinas/salinas_corrected.npy'
