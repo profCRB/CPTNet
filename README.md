@@ -61,6 +61,6 @@ print(temp.shape)
 ### Selecting  Number of samples for Training and Validation for Pavia Centre datset
 ```
 Trn_IP=[0,20,20,20,20,20,20,20,20,20]
-#Vld_IP=[0,20,20,20,20,20,20,20,20,20]
+Vld_IP=[0,20,20,20,20,20,20,20,20,20]
 ```
 
