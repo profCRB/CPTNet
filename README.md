@@ -4,7 +4,7 @@
 Download dataset related .mat files from   
 https://www.ehu.eus/ccwintco/index.php/Hyperspectral_Remote_Sensing_Scenes  
 
-Then use the dataset_creation.py code to convert numpy arrays from .mat files
+Then use the dataset_creation.py code to create numpy arrays from .mat files
 
 ## Dataset loading selecting number of samples for training and validaion in CPTNet.py code
 Use the following python code statements in CPTNet.py to load numpy arrays and select number of traning and validation samples.
