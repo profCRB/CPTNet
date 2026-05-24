@@ -1,7 +1,9 @@
 # Cascade Pixel Transformer with Distance-Driven Spatial Fusion for Hyperspectral Image Classification Using Limited Training Samples
 ## Paper Id: 10534
 ## Journal: IEEE Latin America Transactions
-
+## Authors
+Biri Chanakya Reddy, Research Scholar, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
+Subbian Deivalakshmi, Associate Professor, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
 # CPTNet
 
 ## Creating Numpy array from.mat files
