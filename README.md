@@ -16,13 +16,13 @@ datasets/pavia_centre.md file consists downloadable links for Pavia Centre datas
 
 ## CPTNet.py
 This files consists python implementation of proposed method. 
-Follow th ebelow instructions to implement proposed method against Indian Pines, Salinas, and Pavia Centre datasets.
+Follow the below instructions to implement proposed method against Indian Pines, Salinas, and Pavia Centre datasets.
 ### Implementation for Indian Pines dataset.
-Download the dataset files "indian_pines_corrected.npy" and "indian_pines_gt.npy" by using links in datasets/indian_pines.md files.
+Download the dataset files "indian_pines_corrected.npy" and "indian_pines_gt.npy" by using links in the datasets/indian_pines.md file.
 
 Keep the downloaded files in same folder as CPTNet.py file.
 
-load the numpy files by using following coding statements in CPTNet.py
+Modify the file loading statements in CPTNet.py as shown below.
 ```
 file_path_temp = 'indian_pines_corrected.npy'
 temp = np.load(file_path_temp)
@@ -34,7 +34,7 @@ temp,pca_obj=PCA_fit_transform(temp,5)
 temp=np.transpose(temp,axes=[0,1,3,2])
 print(temp.shape)
 ```
-Set the Number of samples for Training and Validation for Indian Pines datset by using following coding statements in CPTNet.py
+Set the Number of samples for Training and Validation for Indian Pines datset by following modifications in CPTNet.py
 ```
 Trn_IP=[0,10,71,41,11,24,36,10,23,10,48,122,29,10,63,19,10]
 Vld_IP=[0,10,71,41,11,24,36,10,23,5,48,122,29,10,63,19,10]
@@ -42,11 +42,11 @@ Vld_IP=[0,10,71,41,11,24,36,10,23,5,48,122,29,10,63,19,10]
 Run the CPTNet.py to get the results for Indian Pines dataset.
 
 ### Implementation for Salinas dataset.
-Download the dataset files "salinas_corrected.npy" and "salinas_gt.npy" by using links in datasets/salinas.md files.
+Download the dataset files "salinas_corrected.npy" and "salinas_gt.npy" by using links in the datasets/salinas.md file.
 
 Keep the downloaded files in same folder as CPTNet.py file.
 
-load the numpy files by using following coding statements in CPTNet.py
+Modify the file loading statements in CPTNet.py as shown below.
 ```
 file_path_temp = 'salinas_corrected.npy'
 temp = np.load(file_path_temp)
@@ -59,7 +59,7 @@ temp,pca_obj=PCA_fit_transform(temp,5)
 temp=np.transpose(temp,axes=[0,1,3,2])
 print(temp.shape)
 ```
-Set the Number of samples for Training and Validation for Salinas datset by using following coding statements in CPTNet.py
+Set the Number of samples for Training and Validation for Salinas datset by following modifications in CPTNet.py
 ```
 Trn_IP=[0,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
 Vld_IP=[0,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
@@ -67,11 +67,11 @@ Vld_IP=[0,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20]
 Run the CPTNet.py to get the results for Salinas dataset.
 
 ### Implementation for Pavia Centre dataset.
-Download the dataset files "pavia_centre.npy" and "pavia_centre_gt.npy" by using links in datasets/salinas.md files.
+Download the dataset files "pavia_centre.npy" and "pavia_centre_gt.npy" by using links in the datasets/salinas.md file.
 
 Keep the downloaded files in same folder as CPTNet.py file.
 
-load the numpy files by using following coding statements in CPTNet.py
+Modify the file loading statements in CPTNet.py as shown below.
 ```
 file_path_temp = 'pavia_centre.npy'
 temp = np.load(file_path_temp)
@@ -84,7 +84,7 @@ temp,pca_obj=PCA_fit_transform(temp,5)
 temp=np.transpose(temp,axes=[0,1,3,2])
 print(temp.shape)
 ```
-Set the Number of samples for Training and Validation for Pavia Centre datset by using following coding statements in CPTNet.py
+Set the Number of samples for Training and Validation for Pavia Centre datset by following modifications in CPTNet.py
 ```
 Trn_IP=[0,20,20,20,20,20,20,20,20,20]
 Vld_IP=[0,20,20,20,20,20,20,20,20,20]
