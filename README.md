@@ -8,10 +8,6 @@
 | Biri Chanakya Reddy | Research Scholar, Department of ECE, Natitional Institute of Technology Tiruchirappalli, India. |
 | Subbian Deivalakshmi | Associate Professor, Department of ECE, Natitional Institute of Technology Tiruchirappalli, India. |
 
-Biri Chanakya Reddy, Research Scholar, Department of ECE, Natitional Institute of Technology Tiruchirappalli, India.
-
-Subbian Deivalakshmi, Associate Professor, Department of ECE, Natitional Institute of Technology Tiruchirappalli, India.
-
 # File Description
 ## datasets Folder
 datasets/indian_pines.md file consists downloadable links for Indian Pines dataset along with ground truth labels.
