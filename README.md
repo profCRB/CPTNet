@@ -3,6 +3,7 @@
 ## Journal: IEEE Latin America Transactions
 ## Authors
 Biri Chanakya Reddy, Research Scholar, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
+
 Subbian Deivalakshmi, Associate Professor, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
 # CPTNet
 
