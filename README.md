@@ -8,11 +8,11 @@ Subbian Deivalakshmi, Associate Professor, Department od ECE, Natitional Institu
 
 # File Description
 ## datasets Folder
-datasets/indian_pines consists downloadable links for Indian Pines dataset along with ground truth labels.
+datasets/indian_pines.md consists downloadable links for Indian Pines dataset along with ground truth labels.
 
-datasets/salinas consists downloadable links for Salinas dataset along with ground truth labels.
+datasets/salinas.md consists downloadable links for Salinas dataset along with ground truth labels.
 
-datasets/pavia_centre consists downloadable links for Pavia Centre dataset along with ground truth labels
+datasets/pavia_centre.md consists downloadable links for Pavia Centre dataset along with ground truth labels
 
 ## Creating Numpy array from.mat files
 Download dataset related .mat files from   
