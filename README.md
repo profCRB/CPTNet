@@ -1,3 +1,7 @@
+# Cascade Pixel Transformer with Distance-Driven Spatial Fusion for Hyperspectral Image Classification Using Limited Training Samples
+## Paper Id: 10534
+## Journal: IEEE Latin America Transactions
+
 # CPTNet
 
 ## Creating Numpy array from.mat files
