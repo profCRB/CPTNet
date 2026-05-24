@@ -2,9 +2,9 @@
 ## Paper Id: 10534
 ## Journal: IEEE Latin America Transactions
 ## Authors
-Biri Chanakya Reddy, Research Scholar, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
+Biri Chanakya Reddy, Research Scholar, Department of ECE, Natitional Institute of Technology Tiruchirappalli, India.
 
-Subbian Deivalakshmi, Associate Professor, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
+Subbian Deivalakshmi, Associate Professor, Department of ECE, Natitional Institute of Technology Tiruchirappalli, India.
 
 # File Description
 ## datasets Folder
