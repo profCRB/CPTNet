@@ -91,11 +91,12 @@ Vld_IP=[0,20,20,20,20,20,20,20,20,20]
 ```
 Run the CPTNet.py to get the results for Pavia Centre dataset.
 
-## Creating Numpy array from.mat files
-Download dataset related .mat files from   
+## dataset_creation.py  File
+This is optional file in this repository.
+This coding file is used prepare numpy datasets from .mat files available in following well known hyperspectral repository.
 https://www.ehu.eus/ccwintco/index.php/Hyperspectral_Remote_Sensing_Scenes  
 
-Then use the dataset_creation.py code to create numpy arrays from .mat files
+After downloading .mat files, use the dataset_creation.py to generate numpy version of datasets.
 
 
 
