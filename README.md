@@ -93,7 +93,7 @@ Run the CPTNet.py to get the results for Pavia Centre dataset.
 
 ## dataset_creation.py  File
 This is optional file in this repository.
-This coding file is used prepare numpy datasets from .mat files available in following well known hyperspectral repository.
+This coding file is used prepare numpy datasets from .mat files available in following well known hyperspectral repository: 
 https://www.ehu.eus/ccwintco/index.php/Hyperspectral_Remote_Sensing_Scenes  
 
 After downloading .mat files, use the dataset_creation.py to generate numpy version of datasets.
