@@ -5,7 +5,14 @@
 Biri Chanakya Reddy, Research Scholar, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
 
 Subbian Deivalakshmi, Associate Professor, Department od ECE, Natitional Institute of Technology Tiruchirappalli, India.
-# CPTNet
+
+# File Description
+## datasets Folder
+datasets/indian_pines consists downloadable links for Indian Pines dataset along with ground truth labels.
+
+datasets/salinas consists downloadable links for Salinas dataset along with ground truth labels.
+
+datasets/pavia_centre consists downloadable links for Pavia Centre dataset along with ground truth labels
 
 ## Creating Numpy array from.mat files
 Download dataset related .mat files from   
